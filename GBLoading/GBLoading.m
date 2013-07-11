@@ -124,6 +124,9 @@ static BOOL const kDefaultShouldAlwaysReProcess =       NO;
                 //notify of failure
                 if (failure) failure();
             }
+            
+            //remove the operation from the queue
+            [self.inFlightLoads removeObjectForKey:urlString];
         }];
     }];
     
