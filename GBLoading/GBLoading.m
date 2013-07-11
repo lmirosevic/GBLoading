@@ -35,7 +35,7 @@ static BOOL const kDefaultShouldAlwaysReProcess =       NO;
 }
 
 -(id)init {
-    if ([super init]) {
+    if (self = [super init]) {
         self.cache = [NSMutableDictionary new];
         self.inFlightLoads = [NSMutableDictionary new];
         self.operationQueue = [NSOperationQueue new];
@@ -59,7 +59,8 @@ static BOOL const kDefaultShouldAlwaysReProcess =       NO;
 }
 
 -(void)clearCache {
-    [self.cache removeAllObjects];
+    //replaces the old one with a new one
+    self.cache = [NSMutableDictionary new];
 }
 
 -(void)load:(NSString *)urlString withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
@@ -137,8 +138,10 @@ static BOOL const kDefaultShouldAlwaysReProcess =       NO;
 
 -(void)_cancelLoad:(NSString *)urlString {
     NSOperation *operation = self.inFlightLoads[urlString];
-    [operation cancel];
-    [self.inFlightLoads removeObjectForKey:operation];
+    if (operation) {
+        [operation cancel];
+        [self.inFlightLoads removeObjectForKey:operation];
+    }
 }
 
 @end
