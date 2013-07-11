@@ -8,6 +8,8 @@
 
 #import "GBLoading.h"
 
+#import <UIKit/UIKit.h>
+
 static BOOL const kDefaultShouldAlwaysReProcess =       NO;
 
 @interface GBLoading ()

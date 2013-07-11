@@ -31,6 +31,7 @@
 		8ABE3167178EE3FD004B41DA /* GBLoading-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GBLoading-Prefix.pch"; sourceTree = "<group>"; };
 		8ABE3168178EE3FD004B41DA /* GBLoading.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GBLoading.h; sourceTree = "<group>"; };
 		8ABE316A178EE3FD004B41DA /* GBLoading.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GBLoading.m; sourceTree = "<group>"; };
+		8ABE3198178F03C2004B41DA /* StandardProcessors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StandardProcessors.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +76,7 @@
 			children = (
 				8ABE3168178EE3FD004B41DA /* GBLoading.h */,
 				8ABE316A178EE3FD004B41DA /* GBLoading.m */,
+				8ABE3198178F03C2004B41DA /* StandardProcessors.h */,
 				8ABE3166178EE3FD004B41DA /* Supporting Files */,
 			);
 			path = GBLoading;
@@ -242,6 +244,7 @@
 				8ABE3170178EE3FD004B41DA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

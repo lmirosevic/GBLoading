@@ -14,6 +14,8 @@ typedef id(^GBLoadingBackgroundProcessBlock)(id inputObject);
 
 @interface GBLoading : NSObject
 
+#pragma mark - API
+
 +(GBLoading *)sharedLoading;
 
 -(void)cancelLoad:(NSString *)urlString;
@@ -23,3 +25,4 @@ typedef id(^GBLoadingBackgroundProcessBlock)(id inputObject);
 
 @end
 
+#import "StandardProcessors.h"
