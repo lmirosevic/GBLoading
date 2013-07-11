@@ -8,6 +8,18 @@
 
 #import <Foundation/Foundation.h>
 
+typedef void(^GBLoadingSuccessBlock)(id object);
+typedef void(^GBLoadingFailureBlock)();
+typedef id(^GBLoadingBackgroundProcessBlock)(id inputObject);
+
 @interface GBLoading : NSObject
 
++(GBLoading *)sharedLoading;
+
+-(void)cancelLoad:(NSString *)urlString;
+-(void)clearCache;
+-(void)load:(NSString *)urlString withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
+-(void)load:(NSString *)urlString withBackgroundProcessor:(GBLoadingBackgroundProcessBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
+
 @end
+
