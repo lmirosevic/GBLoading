@@ -19,7 +19,7 @@ typedef id(^GBLoadingBackgroundProcessorBlock)(id inputObject);
 +(GBLoading *)sharedLoading;
 
 -(void)loadResource:(NSString *)resource withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
--(void)loadResource:(NSString *)resource withProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
+-(void)loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
 -(BOOL)isLoadingResource:(NSString *)resource;
 -(void)cancelLoadForResource:(NSString *)resource;
 -(void)clearCache;

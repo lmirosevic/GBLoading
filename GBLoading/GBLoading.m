@@ -138,13 +138,13 @@ typedef enum {
 }
 
 -(void)loadResource:(NSString *)resource withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
-    [self loadResource:nil withProcessor:nil success:success failure:failure];
+    [self loadResource:nil withBackgroundProcessor:nil success:success failure:failure];
 }
 
--(void)loadResource:(NSString *)resource withProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
+-(void)loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
     if (!resource) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource" userInfo:nil];
     
-    [self _loadResource:resource withProcessor:processor success:success failure:failure];
+    [self _loadResource:resource withBackgroundProcessor:processor success:success failure:failure];
 }
 
 #pragma mark - util
@@ -169,7 +169,7 @@ typedef enum {
     }
 }
 
--(void)_loadResource:(NSString *)resource withProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
+-(void)_loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
     //in any case we need an egress handler
     GBLoadingEgressHandler *egressHandler = [GBLoadingEgressHandler egressHandlerWithSuccess:success failure:failure];
     
