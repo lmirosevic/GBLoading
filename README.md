@@ -1,7 +1,7 @@
 GBLoading
 ============
 
-An elegant & lightweight asynchornous resource loading library for iOS.
+An elegant, lightweight & most importantly robust asynchronous resource loading library for iOS.
 
 Basic Usage
 ------------
@@ -76,7 +76,7 @@ And then to do the actual cancel, you'd call:
 [canceller cancel];
 ```
 
-Personally, I like to set the `canceller` object as an associated object on my `UITableViewCell` inside `-[UITableView cellForRowAtIndexPath:]`, this way it goes wherever the cell goes. And then inside `-[UITableView tableView:didEndDisplayingCell:forRowAtIndexPath:]` (or inside `-[UITableViewCell prepareForReuse]`), I retrieve the associated object from the cell and call `cancel` on it. It's very robust, and most importantly super simple; it precludes you from having to tracking in flight operations in your own data structures, which cells which specific load operation is associated to, and the general nightmare related to the async loading of resources for tables. You could just add a property for the canceller to your specific `UITableViewCell` subclass if you don't like the idea of messing with the runtime.
+Personally, I like to set the `canceller` object as an associated object on my `UITableViewCell` inside `-[UITableView cellForRowAtIndexPath:]`, this way it goes wherever the cell goes. And then inside `-[UITableView tableView:didEndDisplayingCell:forRowAtIndexPath:]` (or inside `-[UITableViewCell prepareForReuse]`), I retrieve the associated object from the cell and call `cancel` on it. It's very robust, and most importantly super simple; it precludes you from having to tracking in flight operations in your own data structures, which cells which specific load operation is associated to, and the general nightmare related to the async loading of resources for tables. You could just add a property for the canceller to your specific `UITableViewCell` subclass if you don't like the idea of messing with the runtime. The canceller object is about as light as it can get: 1 method implementation and 1 private object reference, so they don't add much weight to your cells at all.
 
 If you receive a memory warning, or if for any other reason you want to clear the cache, then you can do so, however if you then request the same resource again (it will have to be re-downlaoded and re-processed):
 
