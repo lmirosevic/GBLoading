@@ -18,10 +18,11 @@ typedef id(^GBLoadingBackgroundProcessBlock)(id inputObject);
 
 +(GBLoading *)sharedLoading;
 
--(void)cancelLoad:(NSString *)urlString;
+-(void)cancelLoadWithUniqueIdentifier:(id)loadIdentifier;
 -(void)clearCache;
--(void)load:(NSString *)urlString withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
--(void)load:(NSString *)urlString withBackgroundProcessor:(GBLoadingBackgroundProcessBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
+-(void)loadResource:(NSString *)urlString withUniqueIdentifier:(id)loadIdentifier success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
+-(void)loadResource:(NSString *)urlString withUniqueIdentifier:(id)loadIdentifier backgroundProcessor:(GBLoadingBackgroundProcessBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
+-(BOOL)isLoadingForUniqueIdentifier:(id)uniqueIdentifier;
 
 @end
 
