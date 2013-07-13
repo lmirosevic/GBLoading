@@ -16,13 +16,13 @@ To asynchornously load a resource asychronously simply call (your success and fa
 }];
 ```
 
-That's it. You can call whatever UIKit functions you want in your handler because your block is called on the main thread, even though the resource was loaded on a background thread.
+That's it. You can call whatever `UIKit` functions you want in your handler because your block is called on the main thread, even though the resource was loaded on a background thread.
 
 
 Don't forget to import static library header (on iOS):
 
 ```objective-c
-#import "GBLoading"
+#import "GBLoading.h"
 ```
 
 Advanced Usage
@@ -30,7 +30,7 @@ Advanced Usage
 
 You can associate as many handlers with a resource load as you want, so if you call the above many times for the same resource, but with different handlers, all your handlers will fire once the resource becomes available, in the order they were called, and the data will be dowloaded only once!
 
-If the resource that comes from the network needs some heavy processing, then you can do that on the background thread as well before calling back onto the main thread. You can do this by providing a block that processes the raw data that came from the network.
+If the resource that comes from the network needs some heavy processing, then you can do that on the background thread as well before being called back on the main thread in your handler. You can do this by providing a block that processes the raw data that came from the network.
 
 ```objective-c 
 [[GBLoading sharedLoading] loadResource:@"http://..." withBackgroundProcessor:^id(NSData *rawData) {
@@ -78,7 +78,7 @@ And then to do the actual cancel, you'd call:
 
 Personally, I like to set the `canceller` object as an associated object on my `UITableViewCell` inside `-[UITableView cellForRowAtIndexPath:]`, this way it goes wherever the cell goes. And then inside `-[UITableView tableView:didEndDisplayingCell:forRowAtIndexPath:]` (or inside `-[UITableViewCell prepareForReuse]`), I retrieve the associated object from the cell and call `cancel` on it. It's very robust, and most importantly super simple; it precludes you from having to tracking in flight operations in your own data structures, which cells which specific load operation is associated to, and the general nightmare related to the async loading of resources for tables. You could just add a property for the canceller to your specific `UITableViewCell` subclass if you don't like the idea of messing with the runtime. The canceller object is about as light as it can get: 1 method implementation and 1 private object reference, so they don't add much weight to your cells at all.
 
-If you receive a memory warning, or if for any other reason you want to clear the cache, then you can do so, however if you then request the same resource again (it will have to be re-downlaoded and re-processed):
+If you receive a memory warning, or if for any other reason you want to clear the cache, then you can do so, however if you then request the same resource again (it will have to be re-downloaded and re-processed):
 
 ```objective-c
 [[GBLoading sharedLoading] clearCache];
