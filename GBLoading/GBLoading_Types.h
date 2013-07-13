@@ -17,6 +17,6 @@ typedef enum {
 
 typedef void(^GBLoadingSuccessBlock)(id object);
 typedef void(^GBLoadingFailureBlock)(BOOL isCancelled);
-typedef id(^GBLoadingBackgroundProcessorBlock)(id inputObject);
+typedef id(^GBLoadingBackgroundProcessorBlock)(NSData *rawData);
 
 #endif
