@@ -6,7 +6,7 @@ An elegant, lightweight & most importantly robust asynchronous resource loading 
 Basic Usage
 ------------
 
-To asynchornously load a resource asychronously simply call (your success and failure handlers will be called on the main thread):
+To asynchornously load a resource simply call (your success and failure handlers will be called on the main thread):
 
 ```objective-c    
 [[GBLoading sharedLoading] loadResource:@"http://..." withSuccess:^(id object) {
