@@ -9,8 +9,8 @@
 #import <Foundation/Foundation.h>
 
 typedef void(^GBLoadingSuccessBlock)(id object);
-typedef void(^GBLoadingFailureBlock)();
-typedef id(^GBLoadingBackgroundProcessBlock)(id inputObject);
+typedef void(^GBLoadingFailureBlock)(BOOL isCancelled);
+typedef id(^GBLoadingBackgroundProcessorBlock)(id inputObject);
 
 @interface GBLoading : NSObject
 
@@ -18,11 +18,11 @@ typedef id(^GBLoadingBackgroundProcessBlock)(id inputObject);
 
 +(GBLoading *)sharedLoading;
 
--(void)cancelLoadWithUniqueIdentifier:(id)loadIdentifier;
+-(void)loadResource:(NSString *)resource withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
+-(void)loadResource:(NSString *)resource withProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
+-(BOOL)isLoadingResource:(NSString *)resource;
+-(void)cancelLoadForResource:(NSString *)resource;
 -(void)clearCache;
--(void)loadResource:(NSString *)urlString withUniqueIdentifier:(id)loadIdentifier success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
--(void)loadResource:(NSString *)urlString withUniqueIdentifier:(id)loadIdentifier backgroundProcessor:(GBLoadingBackgroundProcessBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
--(BOOL)isLoadingForUniqueIdentifier:(id)uniqueIdentifier;
 
 @end
 
