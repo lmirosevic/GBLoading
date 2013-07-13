@@ -16,7 +16,7 @@ To asynchornously load a resource asychronously simply call (your success and fa
 }];
 ```
 
-That's it. You can call whatever `UIKit` functions you want in your handler because your block is called on the main thread, even though the resource was loaded on a background thread.
+That's it. You can call whatever `UIKit` methods you want in your handler because your block is called on the main thread, even though the resource was loaded on a background thread.
 
 
 Don't forget to import static library header (on iOS):
