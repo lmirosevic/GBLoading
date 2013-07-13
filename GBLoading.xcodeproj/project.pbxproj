@@ -26,12 +26,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8A55EE0B179197F100A27697 /* GBLoadingCanceller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBLoadingCanceller.h; sourceTree = "<group>"; };
+		8A55EE0E1791982100A27697 /* GBLoading_Types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GBLoading_Types.h; sourceTree = "<group>"; };
 		8ABE3160178EE3FD004B41DA /* libGBLoading.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libGBLoading.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8ABE3163178EE3FD004B41DA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		8ABE3167178EE3FD004B41DA /* GBLoading-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GBLoading-Prefix.pch"; sourceTree = "<group>"; };
 		8ABE3168178EE3FD004B41DA /* GBLoading.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GBLoading.h; sourceTree = "<group>"; };
 		8ABE316A178EE3FD004B41DA /* GBLoading.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GBLoading.m; sourceTree = "<group>"; };
-		8ABE3198178F03C2004B41DA /* StandardProcessors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StandardProcessors.h; sourceTree = "<group>"; };
+		8ABE3198178F03C2004B41DA /* GBLoading_StandardProcessors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBLoading_StandardProcessors.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,7 +78,9 @@
 			children = (
 				8ABE3168178EE3FD004B41DA /* GBLoading.h */,
 				8ABE316A178EE3FD004B41DA /* GBLoading.m */,
-				8ABE3198178F03C2004B41DA /* StandardProcessors.h */,
+				8A55EE0B179197F100A27697 /* GBLoadingCanceller.h */,
+				8A55EE0E1791982100A27697 /* GBLoading_Types.h */,
+				8ABE3198178F03C2004B41DA /* GBLoading_StandardProcessors.h */,
 				8ABE3166178EE3FD004B41DA /* Supporting Files */,
 			);
 			path = GBLoading;

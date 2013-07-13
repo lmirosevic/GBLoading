@@ -1,5 +1,5 @@
 //
-//  StandardProcessors.h
+//  GBLoading_StandardProcessors.h
 //  GBLoading
 //
 //  Created by Luka Mirosevic on 11/07/2013.
@@ -7,10 +7,11 @@
 //
 
 
-#ifndef Standard_Processors_h
-#define Standard_Processors_h
+#ifndef GBLoading_Standard_Processors_h
+#define GBLoading_Standard_Processors_h
 
-#import "GBLoading.h"
+#import "GBLoading_Types.h"
+
 #import <UIKit/UIKit.h>
 
 static GBLoadingBackgroundProcessorBlock const KGBLoadingProcessorDataToImage = ^id(id inputObject) {
