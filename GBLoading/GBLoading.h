@@ -23,5 +23,6 @@
 -(BOOL)isLoadingResource:(NSString *)resource;
 -(void)cancelLoadForResource:(NSString *)resource;
 -(void)clearCache;
+-(void)removeResourceFromCache:(NSString *)resource;
 
 @end

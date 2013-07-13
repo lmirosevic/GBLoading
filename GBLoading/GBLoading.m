@@ -149,6 +149,12 @@ static BOOL const kDefaultShouldAlwaysReProcess =           NO;
 
 #pragma mark - API
 
+-(void)removeResourceFromCache:(NSString *)resource {
+    if (!resource) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource" userInfo:nil];
+    
+    [self _removeResourceFromCache:resource];
+}
+
 -(void)clearCache {
     self.cache = [NSMutableDictionary new];
 }
@@ -180,6 +186,10 @@ static BOOL const kDefaultShouldAlwaysReProcess =           NO;
 }
 
 #pragma mark - util
+
+-(void)_removeResourceFromCache:(NSString *)resource {
+    [self.cache removeObjectForKey:resource];
+}
 
 -(void)_markAllEgressHandlersForResource:(NSString *)resource asBeingInState:(GBLoadingState)state {
     for (GBLoadingEgressHandler *egressHandler in self.handlerQueues[resource]) {
