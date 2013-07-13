@@ -8,21 +8,20 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void(^GBLoadingSuccessBlock)(id object);
-typedef void(^GBLoadingFailureBlock)();
-typedef id(^GBLoadingBackgroundProcessBlock)(id inputObject);
+#import "GBLoading_Types.h"
+#import "GBLoading_StandardProcessors.h"
+
+#import "GBLoadingCanceller.h"
 
 @interface GBLoading : NSObject
 
-#pragma mark - API
-
 +(GBLoading *)sharedLoading;
 
--(void)cancelLoad:(NSString *)urlString;
+-(void)loadResource:(NSString *)resource withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
+-(void)loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
+-(void)loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure canceller:(GBLoadingCanceller **)canceller;
+-(BOOL)isLoadingResource:(NSString *)resource;
+-(void)cancelLoadForResource:(NSString *)resource;
 -(void)clearCache;
--(void)load:(NSString *)urlString withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
--(void)load:(NSString *)urlString withBackgroundProcessor:(GBLoadingBackgroundProcessBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
 
 @end
-
-#import "StandardProcessors.h"
