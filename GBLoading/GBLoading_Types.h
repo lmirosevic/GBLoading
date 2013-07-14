@@ -6,9 +6,6 @@
 //  Copyright (c) 2013 Goonbee. All rights reserved.
 //
 
-#ifndef GBLoading_GBLoading_Types_h
-#define GBLoading_GBLoading_Types_h
-
 typedef enum {
     GBLoadingStateNormal,
     GBLoadingStateFailure,
@@ -18,5 +15,3 @@ typedef enum {
 typedef void(^GBLoadingSuccessBlock)(id object);
 typedef void(^GBLoadingFailureBlock)(BOOL isCancelled);
 typedef id(^GBLoadingBackgroundProcessorBlock)(NSData *rawData);
-
-#endif
