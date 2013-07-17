@@ -250,9 +250,6 @@ static BOOL const kDefaultShouldAlwaysReProcess =           NO;
             (processor && originalObject)) {    //we've got something to process
             //process it
             id temp = processor(originalObject);
-    
-            //bail if processor returned nil
-            if (!temp) @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:@"Must return a non nil object from the processor function." userInfo:nil];
             
             processedObject = temp;
         }
@@ -274,8 +271,8 @@ static BOOL const kDefaultShouldAlwaysReProcess =           NO;
                 self.cache[resource] = processedObject;
             }
             
-            //if we didn't get an object from the network, then it's safe to say we failed
-            if (!originalObject) {
+            //if we don't have a processed object, then it's safe to say we failed
+            if (!processedObject) {
                 [self _markAllEgressHandlersForResource:resource asBeingInState:GBLoadingStateFailure];
             }
             
