@@ -13,6 +13,7 @@
 #import <objc/runtime.h>
 
 static BOOL const kDefaultShouldAlwaysReProcess =           NO;
+static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 
 @interface GBLoadingEgressHandler : NSObject
 
@@ -126,6 +127,7 @@ static BOOL const kDefaultShouldAlwaysReProcess =           NO;
         self.cache = [NSMutableDictionary new];
         self.handlerQueues = [NSMutableDictionary new];
         self.loadOperationQueue = [NSOperationQueue new];
+        self.loadOperationQueue.maxConcurrentOperationCount = kDefaultMaxConcurrentRequests;
     }
     return self;
 }
