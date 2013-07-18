@@ -9,7 +9,6 @@
 #import "GBLoading.h"
 
 #import <UIKit/UIKit.h>
-
 #import <objc/runtime.h>
 
 static BOOL const kDefaultShouldAlwaysReProcess =           NO;
