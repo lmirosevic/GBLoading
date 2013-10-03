@@ -151,7 +151,7 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 #pragma mark - API
 
 -(void)removeResourceFromCache:(NSString *)resource {
-    if (!resource) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource" userInfo:nil];
+    if (![resource isKindOfClass:NSString.class]) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource NSString" userInfo:nil];
     
     [self _removeResourceFromCache:resource];
 }
@@ -161,13 +161,13 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 }
 
 -(void)cancelLoadForResource:(NSString *)resource {
-    if (!resource) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource" userInfo:nil];
+    if (![resource isKindOfClass:NSString.class]) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource NSString" userInfo:nil];
     
     [self _cancelLoadForResource:resource];
 }
 
 -(BOOL)isLoadingResource:(NSString *)resource {
-    if (!resource) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource" userInfo:nil];
+    if (![resource isKindOfClass:NSString.class]) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource NSString" userInfo:nil];
     
     return [self _isLoadingResource:resource];
 }
@@ -181,7 +181,7 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 }
 
 -(void)loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure canceller:(GBLoadingCanceller **)canceller {
-    if (!resource) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource" userInfo:nil];
+    if (![resource isKindOfClass:NSString.class]) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource NSString" userInfo:nil];
     
     [self _loadResource:resource withBackgroundProcessor:processor success:success failure:failure canceller:canceller];
 }
@@ -238,7 +238,7 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 
 -(void)_fetchAndProcessResource:(NSString *)resource withProcessor:(GBLoadingBackgroundProcessorBlock)processor {
     //we can assume the values coming in are valid, our principle is: we trust our private methods, but we don't trust the public ones
-
+    
     //check our cache, it might let us avoid a network trip
     id existingObject = self.cache[resource];
     
@@ -254,7 +254,7 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
             
             processedObject = temp;
         }
-        //it it's fresh and there's no processor
+        //if it's fresh and there's no processor
         else if (!existingObject && !processor) {
             //just use the orignal one
             processedObject = originalObject;
