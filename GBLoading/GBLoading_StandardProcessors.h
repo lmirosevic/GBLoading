@@ -10,6 +10,6 @@
 
 #import <UIKit/UIKit.h>
 
-static GBLoadingBackgroundProcessorBlock const KGBLoadingProcessorDataToImage = ^id(NSData *rawData) {
+static GBLoadingBackgroundProcessorBlock const kGBLoadingProcessorDataToImage = ^id(NSData *rawData) {
     return [UIImage imageWithData:rawData];
 };
