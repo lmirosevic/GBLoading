@@ -173,7 +173,7 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 }
 
 -(void)loadResource:(NSString *)resource withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
-    [self loadResource:nil withBackgroundProcessor:nil success:success failure:failure];
+    [self loadResource:resource withBackgroundProcessor:nil success:success failure:failure];
 }
 
 -(void)loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
