@@ -11,7 +11,6 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
-static BOOL const kDefaultShouldAlwaysReProcess =           NO;
 static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 
 @interface GBLoadingEgressHandler : NSObject
