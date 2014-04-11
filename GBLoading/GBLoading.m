@@ -11,6 +11,8 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
+#import <GBToolbox/GBToolbox.h>
+
 static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 
 @interface GBLoadingEgressHandler : NSObject
@@ -99,7 +101,7 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 
 @interface GBLoading ()
 
-@property (strong, nonatomic) NSMutableDictionary       *cache;
+@property (strong, nonatomic) GBCache                   *cache;
 @property (strong, nonatomic) NSMutableDictionary       *handlerQueues;
 @property (strong, nonatomic) NSOperationQueue          *loadOperationQueue;
 
@@ -122,10 +124,11 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 
 -(id)init {
     if (self = [super init]) {
-        self.cache = [NSMutableDictionary new];
+        self.cache = [GBCache new];
         self.handlerQueues = [NSMutableDictionary new];
         self.loadOperationQueue = [NSOperationQueue new];
         self.loadOperationQueue.maxConcurrentOperationCount = kDefaultMaxConcurrentRequests;
+        self.maxCacheSize = kGBCacheUnlimitedCacheSize;
     }
     return self;
 }
@@ -147,6 +150,16 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
     self.loadOperationQueue = nil;
 }
 
+#pragma mark - CA
+
+-(void)setMaxCacheSize:(NSUInteger)maxCacheSize {
+    self.cache.maxCacheSize = maxCacheSize;
+}
+
+-(NSUInteger)maxCacheSize {
+    return self.cache.maxCacheSize;
+}
+
 #pragma mark - API
 
 -(void)removeResourceFromCache:(NSString *)resource {
@@ -156,7 +169,7 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 }
 
 -(void)clearCache {
-    self.cache = [NSMutableDictionary new];
+    [self.cache removeAllObjects];
 }
 
 -(void)cancelLoadForResource:(NSString *)resource {
@@ -247,8 +260,18 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
     
     [self.loadOperationQueue addOperationWithBlock:^{
         //get the resource, either we have it already from the cache, othwerwise go fetch it
-        id originalObject = existingObject ?: [NSData dataWithContentsOfURL:[NSURL URLWithString:resource]];
+        id originalObject;
+        NSUInteger originalObjectDataSize = 0;
+        if (existingObject) {
+            originalObject = existingObject;
+        }
+        else {
+            NSData *downloadedData = [NSData dataWithContentsOfURL:[NSURL URLWithString:resource]];
+            originalObjectDataSize = downloadedData.length;
+            originalObject = downloadedData;
+        }
 
+        //processing
         id processedObject;
         if (!existingObject &&                  //if it's fresh, and
             (processor && originalObject)) {    //we've got something to process
@@ -272,7 +295,7 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             //we might need to cache it if we got a new one
             if (processedObject && !existingObject) {
-                self.cache[resource] = processedObject;
+                [self.cache setObject:processedObject forKey:resource cost:originalObjectDataSize];
             }
             
             //if we don't have a processed object, then it's safe to say we failed
