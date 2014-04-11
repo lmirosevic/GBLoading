@@ -256,55 +256,44 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
     //we can assume the values coming in are valid, our principle is: we trust our private methods, but we don't trust the public ones
     
     //check our cache, it might let us avoid a network trip
-    id existingObject = self.cache[resource];
+    NSData *existingData = self.cache[resource];
     
     [self.loadOperationQueue addOperationWithBlock:^{
         //get the resource, either we have it already from the cache, othwerwise go fetch it
-        id originalObject;
-        NSUInteger originalObjectDataSize = 0;
-        if (existingObject) {
-            originalObject = existingObject;
+        NSData *data;
+        NSUInteger originalDataSize = 0;//only used when freshly downloading data
+        if (existingData) {
+            data = existingData;
         }
         else {
-            NSData *downloadedData = [NSData dataWithContentsOfURL:[NSURL URLWithString:resource]];
-            originalObjectDataSize = downloadedData.length;
-            originalObject = downloadedData;
+            data = [NSData dataWithContentsOfURL:[NSURL URLWithString:resource]];
+            originalDataSize = data.length;
         }
 
-        //processing
-        id processedObject;
-        if (!existingObject &&                  //if it's fresh, and
-            (processor && originalObject)) {    //we've got something to process
-            //process it
-            id temp = processor(originalObject);
-            
-            processedObject = temp;
+        //get the desired object, process it if we have a processor otherwise just pass it on as plain NSData
+        id object;
+        if (processor) {
+            object = processor(data);
         }
-        //if it's fresh and there's no processor
-        else if (!existingObject && !processor) {
-            //just use the orignal one
-            processedObject = originalObject;
-        }
-        //if it's cached
         else {
-            //don't process it
-            processedObject = originalObject;
+            object = data;
         }
         
         //once we're done creating the object, process our egress queue
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            //we might need to cache it if we got a new one
-            if (processedObject && !existingObject) {
-                [self.cache setObject:processedObject forKey:resource cost:originalObjectDataSize];
+            if (object) {
+                //update cache if we got a new one object
+                if (!existingData) {
+                    [self.cache setObject:data forKey:resource cost:originalDataSize];
+                }
             }
-            
-            //if we don't have a processed object, then it's safe to say we failed
-            if (!processedObject) {
+            else {
+                //if we don't have a processed object, then it's safe to say we failed by marking all egress handlers as such
                 [self _markAllEgressHandlersForResource:resource asBeingInState:GBLoadingStateFailure];
             }
             
             //process the queue
-            [self _processEgressQueueForResource:resource withOptionalProcessedObject:processedObject];
+            [self _processEgressQueueForResource:resource withOptionalProcessedObject:object];
         }];
     }];
 }
