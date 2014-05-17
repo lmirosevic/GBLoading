@@ -1,5 +1,4 @@
-GBLoading
-============
+# GBLoading ![Version](https://img.shields.io/cocoapods/v/GBLoading.svg?style=flat)&nbsp;![License](https://img.shields.io/badge/license-Apache_2-green.svg?style=flat)
 
 An elegant, lightweight & most importantly robust asynchronous resource loading library for iOS.
 
