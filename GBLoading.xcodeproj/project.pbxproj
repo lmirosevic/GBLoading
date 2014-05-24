@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A65BB4F19311206000C3508 /* GBPersistentInMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A65BB4E19311206000C3508 /* GBPersistentInMemoryCache.m */; };
 		8ABE3164178EE3FD004B41DA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8ABE3163178EE3FD004B41DA /* Foundation.framework */; };
 		8ABE3169178EE3FD004B41DA /* GBLoading.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8ABE3168178EE3FD004B41DA /* GBLoading.h */; };
 		8ABE316B178EE3FD004B41DA /* GBLoading.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ABE316A178EE3FD004B41DA /* GBLoading.m */; };
@@ -28,6 +29,9 @@
 /* Begin PBXFileReference section */
 		8A55EE0B179197F100A27697 /* GBLoadingCanceller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBLoadingCanceller.h; sourceTree = "<group>"; };
 		8A55EE0E1791982100A27697 /* GBLoading_Types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GBLoading_Types.h; sourceTree = "<group>"; };
+		8A65BB4C19311206000C3508 /* GBLoadingCachingLayerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBLoadingCachingLayerProtocol.h; sourceTree = "<group>"; };
+		8A65BB4D19311206000C3508 /* GBPersistentInMemoryCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBPersistentInMemoryCache.h; sourceTree = "<group>"; };
+		8A65BB4E19311206000C3508 /* GBPersistentInMemoryCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBPersistentInMemoryCache.m; sourceTree = "<group>"; };
 		8ABE3160178EE3FD004B41DA /* libGBLoading.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libGBLoading.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8ABE3163178EE3FD004B41DA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		8ABE3167178EE3FD004B41DA /* GBLoading-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GBLoading-Prefix.pch"; sourceTree = "<group>"; };
@@ -81,6 +85,9 @@
 				8A55EE0B179197F100A27697 /* GBLoadingCanceller.h */,
 				8A55EE0E1791982100A27697 /* GBLoading_Types.h */,
 				8ABE3198178F03C2004B41DA /* GBLoading_StandardProcessors.h */,
+				8A65BB4C19311206000C3508 /* GBLoadingCachingLayerProtocol.h */,
+				8A65BB4D19311206000C3508 /* GBPersistentInMemoryCache.h */,
+				8A65BB4E19311206000C3508 /* GBPersistentInMemoryCache.m */,
 				8ABE3166178EE3FD004B41DA /* Supporting Files */,
 			);
 			path = GBLoading;
@@ -145,6 +152,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A65BB4F19311206000C3508 /* GBPersistentInMemoryCache.m in Sources */,
 				8ABE316B178EE3FD004B41DA /* GBLoading.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
