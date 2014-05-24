@@ -11,8 +11,6 @@
 #import "GBLoading_Types.h"
 #import "GBLoading_StandardProcessors.h"
 #import "GBLoadingCanceller.h"
-#import "GBLoadingCachingLayerProtocol.h"
-#import "GBPersistentInMemoryCache.h"
 
 @protocol GBLoadingCachingLayer;
 

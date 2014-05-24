@@ -8,8 +8,8 @@
 
 #import "GBLoading.h"
 
-#import <UIKit/UIKit.h>
-#import <objc/runtime.h>
+#import "GBLoadingCachingLayerProtocol.h"
+#import "GBPersistentInMemoryCache.h"
 
 #import <GBStorage/GBStorage.h>
 
