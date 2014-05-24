@@ -98,14 +98,9 @@ GBLoading *anotherInstance = [GBLoading new];
 Dependencies
 ------------
 
-No outside dependencies.
+* [GBStorage](https://github.com/lmirosevic/GBStorage)
 
 Runs on iOS 5 and higher.
-
-Linking
-------------
-
-iOS: Add this project to your project's workspace, add dependency for GBLoading, link with your binary, add -ObjC linker flag, add header search path.
 
 Copyright & License
 ------------
@@ -117,5 +112,3 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/lmirosevic/gbloading/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
