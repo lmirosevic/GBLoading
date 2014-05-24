@@ -13,15 +13,20 @@
 
 #import <GBToolbox/GBToolbox.h>
 
-static NSUInteger const kDefaultMaxConcurrentRequests =     6;
+//lm do we need GBToolbox?
+
+static NSUInteger const kDefaultMaxConcurrentRequests =             6;
+static NSUInteger const kDefaultMaxInMemoryCacheCapacity =          10000000; // 10MB
+static BOOL const kDefaultShouldPersistToDisk =                     NO;
+static BOOL const kDefaultShouldCheckResourceFreshnessWithServer =  NO;
 
 @interface GBLoadingEgressHandler : NSObject
 
-@property (copy, nonatomic) GBLoadingSuccessBlock           success;
-@property (copy, nonatomic) GBLoadingFailureBlock           failure;
+@property (copy, nonatomic) GBLoadingSuccessBlock                   success;
+@property (copy, nonatomic) GBLoadingFailureBlock                   failure;
 
-@property (assign, nonatomic) GBLoadingState                state;
-@property (assign, nonatomic) BOOL                          isCompleted;
+@property (assign, nonatomic) GBLoadingState                        state;
+@property (assign, nonatomic) BOOL                                  isCompleted;
 
 +(GBLoadingEgressHandler *)egressHandlerWithSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
 -(id)initWithSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
@@ -69,7 +74,7 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 
 @interface GBLoadingCanceller ()
 
-@property (weak, nonatomic) GBLoadingEgressHandler  *egressHandler;
+@property (weak, nonatomic) GBLoadingEgressHandler                  *egressHandler;
 
 @end
 
@@ -101,9 +106,9 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 
 @interface GBLoading ()
 
-@property (strong, nonatomic) GBCache                   *cache;
-@property (strong, nonatomic) NSMutableDictionary       *handlerQueues;
-@property (strong, nonatomic) NSOperationQueue          *loadOperationQueue;
+@property (strong, nonatomic) GBPersistentInMemoryCache             *cache;
+@property (strong, nonatomic) NSMutableDictionary                   *handlerQueues;
+@property (strong, nonatomic) NSOperationQueue                      *loadOperationQueue;
 
 @end
 
@@ -124,16 +129,18 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 
 -(id)init {
     if (self = [super init]) {
-        self.cache = [GBCache new];
+        self.cache = [GBPersistentInMemoryCache new];
         self.handlerQueues = [NSMutableDictionary new];
         self.loadOperationQueue = [NSOperationQueue new];
         self.loadOperationQueue.maxConcurrentOperationCount = kDefaultMaxConcurrentRequests;
-        self.maxCacheSize = kGBCacheUnlimitedCacheSize;
+        self.maxInMemoryCacheCapacity = kDefaultMaxInMemoryCacheCapacity;
+        self.shouldPersistToDisk = kDefaultShouldPersistToDisk;
+        self.shouldCheckResourceFreshnessWithServer = kDefaultShouldCheckResourceFreshnessWithServer;
     }
     return self;
 }
 
--(void)dealloc {
+-(void)dealloc {        
     self.cache = nil;
     
     //process all handler queues
@@ -152,12 +159,28 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 
 #pragma mark - CA
 
--(void)setMaxCacheSize:(NSUInteger)maxCacheSize {
-    self.cache.maxCacheSize = maxCacheSize;
+-(void)setMaxInMemoryCacheCapacity:(NSUInteger)maxInMemoryCacheCapacity {
+    self.cache.maxInMemoryCacheCapacity = maxInMemoryCacheCapacity;
 }
 
--(NSUInteger)maxCacheSize {
-    return self.cache.maxCacheSize;
+-(NSUInteger)maxInMemoryCacheCapacity {
+    return self.cache.maxInMemoryCacheCapacity;
+}
+
+-(void)setMaxConcurrentRequests:(NSInteger)maxConcurrentRequests {
+    self.loadOperationQueue.maxConcurrentOperationCount = maxConcurrentRequests;
+}
+
+-(NSInteger)maxConcurrentRequests {
+    return self.loadOperationQueue.maxConcurrentOperationCount;
+}
+
+-(void)setShouldPersistToDisk:(BOOL)shouldPersistToDisk {
+    self.cache.shouldPersistToDisk = shouldPersistToDisk;
+}
+
+-(BOOL)shouldPersistToDisk {
+    return self.cache.shouldPersistToDisk;
 }
 
 #pragma mark - API
@@ -165,11 +188,11 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 -(void)removeResourceFromCache:(NSString *)resource {
     if (![resource isKindOfClass:NSString.class]) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource NSString" userInfo:nil];
     
-    [self _removeResourceFromCache:resource];
+    [self.cache removeResourceForKey:resource];
 }
 
 -(void)clearCache {
-    [self.cache removeAllObjects];
+    [self.cache clear];
 }
 
 -(void)cancelLoadForResource:(NSString *)resource {
@@ -203,10 +226,6 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 }
 
 #pragma mark - util
-
--(void)_removeResourceFromCache:(NSString *)resource {
-    [self.cache removeObjectForKey:resource];
-}
 
 -(void)_markAllEgressHandlersForResource:(NSString *)resource asBeingInState:(GBLoadingState)state {
     for (GBLoadingEgressHandler *egressHandler in self.handlerQueues[resource]) {
@@ -255,22 +274,54 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
 -(void)_fetchAndProcessResource:(NSString *)resource withProcessor:(GBLoadingBackgroundProcessorBlock)processor {
     //we can assume the values coming in are valid, our principle is: we trust our private methods, but we don't trust the public ones
     
-    //check our cache, it might let us avoid a network trip
-    NSData *existingData = self.cache[resource];
-    
+    //->bg thread
     [self.loadOperationQueue addOperationWithBlock:^{
-        //get the resource, either we have it already from the cache, othwerwise go fetch it
         NSData *data;
-        NSUInteger originalDataSize = 0;//only used when freshly downloading data
-        if (existingData) {
-            data = existingData;
+        NSHTTPURLResponse *response;
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:resource]];
+        [request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];// this forces NSURLConnection not to cache stuff, that's ok as we're manually caching ourselves
+
+        if (self.shouldCheckResourceFreshnessWithServer) {
+            // get the version of the cached resource, if any
+            NSString *eTag = [self.cache getResourceMetaForKey:resource];
+            
+            // attempt to load resource with the ETag set
+            if (eTag) [request setValue:eTag forHTTPHeaderField:@"If-None-Match"];
+            
+            data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+
+            // if the status is 304...
+            if (response.statusCode == 304) {
+                // it means server dind't return any data, so get the locally cached data for the resource
+                data = [self.cache getResourceDataForKey:resource];
+            }
+            // else if got some data
+            else if (data) {
+                // get the resource
+                // noop, it's already been gotten (into *data)
+
+                // get ETag
+                NSString *freshETag = response.allHeaderFields[@"ETag"];
+                
+                // cache it
+                [self.cache cacheResource:data withMeta:freshETag size:data.length forKey:resource];
+            }
         }
         else {
-            data = [NSData dataWithContentsOfURL:[NSURL URLWithString:resource]];
-            originalDataSize = data.length;
+            // attempt to fetch from cache
+            data = [self.cache getResourceDataForKey:resource];
+            
+            // if we don't have it in the cache...
+            if (!data) {
+                // go get it from the server
+                data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+                
+                // add it to the cache
+                [self.cache cacheResource:data withMeta:nil size:data.length forKey:resource];
+            }
         }
 
-        //get the desired object, process it if we have a processor otherwise just pass it on as plain NSData
+        // process the data if there is a processor set
         id object;
         if (processor) {
             object = processor(data);
@@ -278,16 +329,11 @@ static NSUInteger const kDefaultMaxConcurrentRequests =     6;
         else {
             object = data;
         }
-        
-        //once we're done creating the object, process our egress queue
+
+        //->fg thread
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            if (object) {
-                //update cache if we got a new one object
-                if (!existingData) {
-                    [self.cache setObject:data forKey:resource cost:originalDataSize];
-                }
-            }
-            else {
+            // if we don't have anything now, then mark the resource as failed
+            if (!object) {
                 //if we don't have a processed object, then it's safe to say we failed by marking all egress handlers as such
                 [self _markAllEgressHandlersForResource:resource asBeingInState:GBLoadingStateFailure];
             }
