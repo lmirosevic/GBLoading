@@ -11,12 +11,10 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
-#import <GBToolbox/GBToolbox.h>
-
-//lm do we need GBToolbox?
+#import <GBStorage/GBStorage.h>
 
 static NSUInteger const kDefaultMaxConcurrentRequests =             6;
-static NSUInteger const kDefaultMaxInMemoryCacheCapacity =          10000000; // 10MB
+#define kDefaultMaxInMemoryCacheCapacity                            kGBStorageMemoryCapUnlimited
 static BOOL const kDefaultShouldPersistToDisk =                     NO;
 static BOOL const kDefaultShouldCheckResourceFreshnessWithServer =  NO;
 
@@ -116,7 +114,7 @@ static BOOL const kDefaultShouldCheckResourceFreshnessWithServer =  NO;
 
 #pragma mark - memory
 
-+(GBLoading *)sharedLoading {
++(instancetype)sharedLoading {
     static GBLoading *_sharedLoading;
     @synchronized(self) {
         if (!_sharedLoading) {

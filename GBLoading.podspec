@@ -11,6 +11,5 @@ Pod::Spec.new do |s|
   s.public_header_files = 'GBLoading/*.h'
   s.requires_arc = true
 
-  s.dependency 'GBToolbox'
   s.dependency 'GBStorage', '~> 2.1'
 end

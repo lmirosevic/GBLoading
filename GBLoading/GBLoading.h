@@ -18,10 +18,10 @@
 
 @interface GBLoading : NSObject
 
-+(GBLoading *)sharedLoading;
++(instancetype)sharedLoading;
 
 @property (assign, nonatomic) NSInteger         maxConcurrentRequests;                      // default: 6. Set NSOperationQueueDefaultMaxConcurrentOperationCount for automatic.
-@property (assign, nonatomic) NSUInteger        maxInMemoryCacheCapacity;                   // default: 10MB. Set kGBStorageMemoryCapUnlimited for no memory cap.
+@property (assign, nonatomic) NSUInteger        maxInMemoryCacheCapacity;                   // default: kGBStorageMemoryCapUnlimited
 @property (assign, nonatomic) BOOL              shouldPersistToDisk;                        // default: NO
 @property (assign, nonatomic) BOOL              shouldCheckResourceFreshnessWithServer;     // default: NO. This use the ETag so make sure your remote resource has one set, otherwise it will redownload the resource every time if this property is set to YES.
 
