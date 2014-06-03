@@ -21,7 +21,9 @@
 @property (assign, nonatomic) NSInteger         maxConcurrentRequests;                      // default: 6. Set NSOperationQueueDefaultMaxConcurrentOperationCount for automatic.
 @property (assign, nonatomic) NSUInteger        maxInMemoryCacheCapacity;                   // default: kGBStorageMemoryCapUnlimited
 @property (assign, nonatomic) BOOL              shouldPersistToDisk;                        // default: NO
-@property (assign, nonatomic) BOOL              shouldCheckResourceFreshnessWithServer;     // default: NO. This use the ETag so make sure your remote resource has one set, otherwise it will redownload the resource every time if this property is set to YES.
+@property (assign, nonatomic) BOOL              shouldCheckResourceFreshnessWithServer;     // default: NO. When set to YES, the library will ping the server to make sure the resource is fresh and if so use the one from the local cache with no data transferred from the server other than a freshness acknwledgement (this works using the ETag so make sure your remote resources have them set, otherwise it will end up redownloading the resource every time, even if it's already in the cache). When set to NO, the library will consult the local cache for the resource first, and if it finds it will immediately return it with no server hop, otherwise it will go fetch the resources, this mode is useful for static content with a fingerprinted URL whose content will never change (like heavy images).
+
+-(id)init;
 
 -(void)loadResource:(NSString *)resource withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
 -(void)loadResource:(NSString *)resource withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure canceller:(GBLoadingCanceller **)canceller;
