@@ -314,8 +314,10 @@ static BOOL const kDefaultShouldCheckResourceFreshnessWithServer =  NO;
                 // go get it from the server
                 data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
                 
-                // add it to the cache
-                [self.cache cacheResource:data withMeta:nil size:data.length forKey:resource];
+                // if we got something, add it to the cache
+                if (data) {
+                    [self.cache cacheResource:data withMeta:nil size:data.length forKey:resource];
+                }
             }
         }
 
