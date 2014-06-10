@@ -1,5 +1,5 @@
 //
-//  GBLoadingCachingLayerProtocol.h
+//  GBLoadingCachingLayer.h
 //  GBLoading
 //
 //  Created by Luka Mirosevic on 24/05/2014.
