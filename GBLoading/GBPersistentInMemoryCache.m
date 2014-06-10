@@ -10,8 +10,8 @@
 
 #import <GBStorage/GBStorage.h>
 
-static NSString * const kStorageNamespaceData =             @"GBLoadingDiskCacheData";
-static NSString * const kStorageNamespaceMeta =             @"GBLoadingDiskCacheMeta";
+static NSString * const kStorageNamespaceData =             @"GBLoading.DiskCache.Data";
+static NSString * const kStorageNamespaceMeta =             @"GBLoading.DiskCache.Meta";
 
 @implementation GBPersistentInMemoryCache
 
@@ -29,7 +29,7 @@ static NSString * const kStorageNamespaceMeta =             @"GBLoadingDiskCache
 
 -(void)cacheResource:(NSData *)resource withMeta:(id<NSCoding>)meta size:(NSUInteger)size forKey:(NSString *)resourceKey {
     [GBStorage(kStorageNamespaceData) setObject:resource forKey:resourceKey withSize:resource.length persistImmediately:self.shouldPersistToDisk];
-    if (meta) [GBStorage(kStorageNamespaceData) setObject:meta forKey:resourceKey withSize:0 persistImmediately:self.shouldPersistToDisk];
+    if (meta) [GBStorage(kStorageNamespaceMeta) setObject:meta forKey:resourceKey withSize:0 persistImmediately:self.shouldPersistToDisk];
 }
 
 -(void)removeResourceForKey:(NSString *)resourceKey {
