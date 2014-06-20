@@ -13,18 +13,19 @@
 
 #import <GBStorage/GBStorage.h>
 
-static NSUInteger const kDefaultMaxConcurrentRequests =             6;
-#define kDefaultMaxInMemoryCacheCapacity                            kGBStorageMemoryCapUnlimited
-static BOOL const kDefaultShouldPersistToDisk =                     NO;
-static BOOL const kDefaultShouldCheckResourceFreshnessWithServer =  NO;
+static NSUInteger const kDefaultMaxConcurrentRequests =                                     6;
+#define kDefaultMaxInMemoryCacheCapacity                                                    kGBStorageMemoryCapUnlimited
+static BOOL const kDefaultShouldPersistToDisk =                                             NO;
+static BOOL const kDefaultShouldCheckResourceFreshnessWithServer =                          NO;
+static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOfError =     YES;
 
 @interface GBLoadingEgressHandler : NSObject
 
-@property (copy, nonatomic) GBLoadingSuccessBlock                   success;
-@property (copy, nonatomic) GBLoadingFailureBlock                   failure;
+@property (copy, nonatomic) GBLoadingSuccessBlock                                           success;
+@property (copy, nonatomic) GBLoadingFailureBlock                                           failure;
 
-@property (assign, nonatomic) GBLoadingState                        state;
-@property (assign, nonatomic) BOOL                                  isCompleted;
+@property (assign, nonatomic) GBLoadingState                                                state;
+@property (assign, nonatomic) BOOL                                                          isCompleted;
 
 +(GBLoadingEgressHandler *)egressHandlerWithSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
 -(id)initWithSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
@@ -72,7 +73,7 @@ static BOOL const kDefaultShouldCheckResourceFreshnessWithServer =  NO;
 
 @interface GBLoadingCanceller ()
 
-@property (weak, nonatomic) GBLoadingEgressHandler                  *egressHandler;
+@property (weak, nonatomic) GBLoadingEgressHandler                                          *egressHandler;
 
 @end
 
@@ -104,9 +105,9 @@ static BOOL const kDefaultShouldCheckResourceFreshnessWithServer =  NO;
 
 @interface GBLoading ()
 
-@property (strong, nonatomic) GBPersistentInMemoryCache             *cache;
-@property (strong, nonatomic) NSMutableDictionary                   *handlerQueues;
-@property (strong, nonatomic) NSOperationQueue                      *loadOperationQueue;
+@property (strong, nonatomic) GBPersistentInMemoryCache                                     *cache;
+@property (strong, nonatomic) NSMutableDictionary                                           *handlerQueues;
+@property (strong, nonatomic) NSOperationQueue                                              *loadOperationQueue;
 
 @end
 
@@ -134,6 +135,7 @@ static BOOL const kDefaultShouldCheckResourceFreshnessWithServer =  NO;
         self.maxInMemoryCacheCapacity = kDefaultMaxInMemoryCacheCapacity;
         self.shouldPersistToDisk = kDefaultShouldPersistToDisk;
         self.shouldCheckResourceFreshnessWithServer = kDefaultShouldCheckResourceFreshnessWithServer;
+        self.shouldFallbackToPotentiallyStaleCachedResourceInCaseOfError = kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOfError;
     }
     return self;
 }
@@ -286,11 +288,12 @@ static BOOL const kDefaultShouldCheckResourceFreshnessWithServer =  NO;
             // attempt to load resource with the ETag set
             if (eTag) [request setValue:eTag forHTTPHeaderField:@"If-None-Match"];
             
-            data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
-
-            // if the status is 304...
-            if (response.statusCode == 304) {
-                // it means server dind't return any data, so get the locally cached data for the resource
+            NSError *error;
+            data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+            
+            // if the status is 304... or in case of error with laxed requirements...
+            if (response.statusCode == 304 || (error && self.shouldFallbackToPotentiallyStaleCachedResourceInCaseOfError)) {
+                // it means server didn't return any data, so get the locally cached data for the resource
                 data = [self.cache getResourceDataForKey:resource];
             }
             // else if got some data
