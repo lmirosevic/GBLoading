@@ -220,9 +220,21 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
 }
 
 -(void)loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure canceller:(GBLoadingCanceller **)canceller {
-    if (![resource isKindOfClass:NSString.class]) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource NSString" userInfo:nil];
+    // make sure the resource is a valid URL
+    BOOL isString = [resource isKindOfClass:NSString.class];
+    BOOL isNonEmpty = resource.length > 0;
+    BOOL validURL = [NSURL URLWithString:resource] != nil;
     
-    [self _loadResource:resource withBackgroundProcessor:processor success:success failure:failure canceller:canceller];
+    // if the resource is a valid URL
+    if (isString && isNonEmpty && validURL) {
+        // proceed with loading the resource
+        [self _loadResource:resource withBackgroundProcessor:processor success:success failure:failure canceller:canceller];
+    }
+    // the resource URL was invalid
+    else {
+        // immediately call the failure handler
+        if (failure) failure(NO);
+    }
 }
 
 #pragma mark - util
