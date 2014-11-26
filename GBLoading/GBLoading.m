@@ -27,20 +27,20 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
 @property (assign, nonatomic) GBLoadingState                                                state;
 @property (assign, nonatomic) BOOL                                                          isCompleted;
 
-+(GBLoadingEgressHandler *)egressHandlerWithSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
--(id)initWithSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
++ (GBLoadingEgressHandler *)egressHandlerWithSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
+- (id)initWithSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
 
--(void)executeWithOptionalProcessedObject:(id)processedObject;
+- (void)executeWithOptionalProcessedObject:(id)processedObject;
 
 @end
 
 @implementation GBLoadingEgressHandler
 
-+(GBLoadingEgressHandler *)egressHandlerWithSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
++ (GBLoadingEgressHandler *)egressHandlerWithSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
     return [[self alloc] initWithSuccess:success failure:failure];
 }
 
--(id)initWithSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
+- (id)initWithSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
     if (self = [super init]) {
         self.success = success;
         self.failure = failure;
@@ -51,7 +51,7 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
     return self;
 }
 
--(void)executeWithOptionalProcessedObject:(id)processedObject {
+- (void)executeWithOptionalProcessedObject:(id)processedObject {
     self.isCompleted = YES;
     
     switch (self.state) {
@@ -81,7 +81,7 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
 
 #pragma mark - API
 
--(void)cancel {
+- (void)cancel {
     if (!self.egressHandler.isCompleted) {
         self.egressHandler.state = GBLoadingStateCancellation;
     }
@@ -89,11 +89,11 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
 
 #pragma mark - util
 
-+(GBLoadingCanceller *)_cancellerWithEgressHandler:(GBLoadingEgressHandler *)egressHandler {
++ (GBLoadingCanceller *)_cancellerWithEgressHandler:(GBLoadingEgressHandler *)egressHandler {
     return [[self alloc] _initWithEgressHandler:egressHandler];
 }
 
--(id)_initWithEgressHandler:(GBLoadingEgressHandler *)egressHandler {
+- (id)_initWithEgressHandler:(GBLoadingEgressHandler *)egressHandler {
     if (self = [super init]) {
         self.egressHandler = egressHandler;
     }
@@ -115,7 +115,7 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
 
 #pragma mark - memory
 
-+(instancetype)sharedLoading {
++ (instancetype)sharedLoading {
     static GBLoading *_sharedLoading;
     @synchronized(self) {
         if (!_sharedLoading) {
@@ -126,7 +126,7 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
     return _sharedLoading;
 }
 
--(id)init {
+- (id)init {
     if (self = [super init]) {
         self.cache = [GBPersistentInMemoryCache new];
         self.handlerQueues = [NSMutableDictionary new];
@@ -140,7 +140,7 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
     return self;
 }
 
--(void)dealloc {        
+- (void)dealloc {        
     self.cache = nil;
     
     //process all handler queues
@@ -159,74 +159,90 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
 
 #pragma mark - CA
 
--(void)setMaxInMemoryCacheCapacity:(NSUInteger)maxInMemoryCacheCapacity {
+- (void)setMaxInMemoryCacheCapacity:(NSUInteger)maxInMemoryCacheCapacity {
     self.cache.maxInMemoryCacheCapacity = maxInMemoryCacheCapacity;
 }
 
--(NSUInteger)maxInMemoryCacheCapacity {
+- (NSUInteger)maxInMemoryCacheCapacity {
     return self.cache.maxInMemoryCacheCapacity;
 }
 
--(void)setMaxConcurrentRequests:(NSInteger)maxConcurrentRequests {
+- (void)setMaxConcurrentRequests:(NSInteger)maxConcurrentRequests {
     self.loadOperationQueue.maxConcurrentOperationCount = maxConcurrentRequests;
 }
 
--(NSInteger)maxConcurrentRequests {
+- (NSInteger)maxConcurrentRequests {
     return self.loadOperationQueue.maxConcurrentOperationCount;
 }
 
--(void)setShouldPersistToDisk:(BOOL)shouldPersistToDisk {
+- (void)setShouldPersistToDisk:(BOOL)shouldPersistToDisk {
     self.cache.shouldPersistToDisk = shouldPersistToDisk;
 }
 
--(BOOL)shouldPersistToDisk {
+- (BOOL)shouldPersistToDisk {
     return self.cache.shouldPersistToDisk;
 }
 
 #pragma mark - API
 
--(void)removeResourceFromCache:(NSString *)resource {
-    if (![resource isKindOfClass:NSString.class]) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource NSString" userInfo:nil];
-    
-    [self.cache removeResourceForKey:resource];
+- (void)removeResourceFromCache:(NSString *)resource {
+    if ([self _isValidResourceString:resource]) {
+        [self.cache removeResourceForKey:resource];
+    }
 }
 
--(void)clearCache {
+- (void)clearCache {
     [self.cache clear];
 }
 
--(void)cancelLoadForResource:(NSString *)resource {
-    if (![resource isKindOfClass:NSString.class]) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource NSString" userInfo:nil];
-    
-    [self _cancelLoadForResource:resource];
+- (void)cancelLoadForResource:(NSString *)resource {
+    if ([self _isValidResourceString:resource]) {
+        [self _cancelLoadForResource:resource];
+    }
 }
 
--(BOOL)isLoadingResource:(NSString *)resource {
-    if (![resource isKindOfClass:NSString.class]) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Must provide a resource NSString" userInfo:nil];
-    
-    return [self _isLoadingResource:resource];
+- (BOOL)isResourceInCache:(NSString *)resource {
+    if ([self _isValidResourceString:resource]) {
+        return ([self.cache getResourceDataForKey:resource] != nil);
+    }
+    else {
+        return NO;
+    }
 }
 
--(void)loadResource:(NSString *)resource withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
+- (id)cachedObjectForResource:(NSString *)resource {
+    if ([self _isValidResourceString:resource]) {
+        return [self.cache getResourceDataForKey:resource];
+    }
+    else {
+        return nil;
+    }
+}
+
+- (BOOL)isLoadingResource:(NSString *)resource {
+    if ([self _isValidResourceString:resource]) {
+        return [self _isLoadingResource:resource];
+    }
+    else {
+        return NO;
+    }
+}
+
+- (void)loadResource:(NSString *)resource withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
     [self loadResource:resource withBackgroundProcessor:nil success:success failure:failure canceller:nil];
 }
 
--(void)loadResource:(NSString *)resource withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure canceller:(GBLoadingCanceller **)canceller {
+- (void)loadResource:(NSString *)resource withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure canceller:(GBLoadingCanceller **)canceller {
     [self loadResource:resource withBackgroundProcessor:nil success:success failure:failure canceller:canceller];
 }
 
--(void)loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
+- (void)loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure {
     [self loadResource:resource withBackgroundProcessor:processor success:success failure:failure canceller:nil];
 }
 
--(void)loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure canceller:(GBLoadingCanceller **)canceller {
-    // make sure the resource is a valid URL
-    BOOL isString = [resource isKindOfClass:NSString.class];
-    BOOL isNonEmpty = resource.length > 0;
-    BOOL validURL = [NSURL URLWithString:resource] != nil;
-    
+- (void)loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure canceller:(GBLoadingCanceller **)canceller {
     // if the resource is a valid URL
-    if (isString && isNonEmpty && validURL) {
+    if ([self _isValidResourceString:resource]) {
         // proceed with loading the resource
         [self _loadResource:resource withBackgroundProcessor:processor success:success failure:failure canceller:canceller];
     }
@@ -237,29 +253,37 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
     }
 }
 
-#pragma mark - util
+#pragma mark - Private
 
--(void)_markAllEgressHandlersForResource:(NSString *)resource asBeingInState:(GBLoadingState)state {
+- (BOOL)_isValidResourceString:(NSString *)resource {
+    BOOL isString = [resource isKindOfClass:NSString.class];
+    BOOL isNonEmpty = resource.length > 0;
+    BOOL isValidURL = [NSURL URLWithString:resource] != nil;
+    
+    return (isString && isNonEmpty && isValidURL);
+}
+
+- (void)_markAllEgressHandlersForResource:(NSString *)resource asBeingInState:(GBLoadingState)state {
     for (GBLoadingEgressHandler *egressHandler in self.handlerQueues[resource]) {
         egressHandler.state = state;
     }
 }
 
--(BOOL)_isLoadingResource:(NSString *)resource {
+- (BOOL)_isLoadingResource:(NSString *)resource {
     //we know it's loading if there is anything in the queue, because once a load finishes we always clear the entire queue
     BOOL areEgressHandlersEnqueued = ([self _egressQueueForResource:resource].count > 0);
 
     return (areEgressHandlersEnqueued);
 }
 
--(void)_cancelLoadForResource:(NSString *)resource {
+- (void)_cancelLoadForResource:(NSString *)resource {
     //we just set the cancelled flag on all our enqueued resources, this might mask a failure, however the client probably doesn't care at this point since he clearly no longer wants the object for the resource
     for (GBLoadingEgressHandler *egressHandler in [self _egressQueueForResource:resource]) {
         egressHandler.state = GBLoadingStateCancellation;
     }
 }
 
--(void)_loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure canceller:(GBLoadingCanceller **)canceller {
+- (void)_loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure canceller:(GBLoadingCanceller **)canceller {
     //first check if this resource is already being loaded
     BOOL isLoadingResource = [self _isLoadingResource:resource];
     
@@ -283,7 +307,7 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
     }
 }
 
--(void)_fetchAndProcessResource:(NSString *)resource withProcessor:(GBLoadingBackgroundProcessorBlock)processor {
+- (void)_fetchAndProcessResource:(NSString *)resource withProcessor:(GBLoadingBackgroundProcessorBlock)processor {
     //we can assume the values coming in are valid, our principle is: we trust our private methods, but we don't trust the public ones
     
     //->bg thread
@@ -292,7 +316,7 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
         NSHTTPURLResponse *response;
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:resource]];
         [request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];// this forces NSURLConnection not to cache stuff, that's ok as we're manually caching ourselves
-
+        
         if (self.shouldCheckResourceFreshnessWithServer) {
             // get the version of the cached resource, if any
             NSString *eTag = [self.cache getResourceMetaForKey:resource];
@@ -329,8 +353,9 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
                 // go get it from the server
                 data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
                 
-                // if we got something, add it to the cache
+                // if we got something...
                 if (data) {
+                    // add it to the cache
                     [self.cache cacheResource:data withMeta:nil size:data.length forKey:resource];
                 }
             }
@@ -359,7 +384,7 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
     }];
 }
 
--(void)_processEgressQueueForResource:(NSString *)resource withOptionalProcessedObject:(id)processedObject {
+- (void)_processEgressQueueForResource:(NSString *)resource withOptionalProcessedObject:(id)processedObject {
     //process everything on the queue
     for (GBLoadingEgressHandler *egressHandler in [self _egressQueueForResource:resource]) {
         [egressHandler executeWithOptionalProcessedObject:processedObject];
@@ -369,11 +394,11 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
     [self _emptyQueueForResource:resource];
 }
 
--(void)_enqueueEgressHandler:(GBLoadingEgressHandler *)egressHandler forResource:(NSString *)resource {
+- (void)_enqueueEgressHandler:(GBLoadingEgressHandler *)egressHandler forResource:(NSString *)resource {
     [[self _egressQueueForResource:resource] addObject:egressHandler];
 }
 
--(NSMutableArray *)_egressQueueForResource:(NSString *)resource {
+- (NSMutableArray *)_egressQueueForResource:(NSString *)resource {
     id egressQeueu = self.handlerQueues[resource];
     
     //create it if it doesn't exist
@@ -385,7 +410,7 @@ static BOOL const kDefaultShouldFallbackToPotentiallyStaleCachedResourceInCaseOf
     return egressQeueu;
 }
 
--(void)_emptyQueueForResource:(NSString *)resource {
+- (void)_emptyQueueForResource:(NSString *)resource {
     [self.handlerQueues removeObjectForKey:resource];
 }
 

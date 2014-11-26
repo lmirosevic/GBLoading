@@ -57,7 +57,7 @@
 /**
  Shared instance as singleton. You can also create your own instances using `init`.
  */
- +(instancetype)sharedLoading;
+ + (instancetype)sharedLoading;
 
 /**
  Create an instance which has its own state.
@@ -70,17 +70,17 @@
 - (void)loadResource:(NSString *)resource withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
 
 /**
- Load a resource.
+ Load a resource. You can call -[cancel] on the canceller to stop the load, this will immediately call the failure block with the `cancelled` flag set to YES. The download for the resource will still continue in the background and subsequent loads will benefit from the cache.
  */
 - (void)loadResource:(NSString *)resource withSuccess:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure canceller:(GBLoadingCanceller **)canceller;
 
 /**
- Load a resource.
+ Load a resource. Includes a process block which converts the rawData into an object and returns it in the success block.
  */
 - (void)loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure;
 
 /**
- Load a resource.
+ Load a resource. Includes both a processor and a canceller.
  */
 - (void)loadResource:(NSString *)resource withBackgroundProcessor:(GBLoadingBackgroundProcessorBlock)processor success:(GBLoadingSuccessBlock)success failure:(GBLoadingFailureBlock)failure canceller:(GBLoadingCanceller **)canceller;
 
@@ -95,14 +95,29 @@
 - (void)cancelLoadForResource:(NSString *)resource;
 
 /**
- Expunges the entire cache. This also deletes disk copies.
+ Returns YES if the resource is in the cache. In memory cache and on disk cache are not differentiated.
+ */
+- (BOOL)isResourceInCache:(NSString *)resource;
+
+/**
+ Returns the cached data for the resource. Returns nil if the resource is not in the cache.
+ */
+- (id)cachedObjectForResource:(NSString *)resource;
+
+/**
+ Expunges the entire cache. This also deletes disk copies. This clears the cache for all GBLoading instances, since the cache is shared.
  */
 - (void)clearCache;
 
 /**
- Expunges a specific resource from the cache. This also deletes disk copies.
+ Expunges a specific resource from the cache. This also deletes disk copies. This operation applies to the cache for all GBLoading instances.
  */
 - (void)removeResourceFromCache:(NSString *)resource;
 
 @end
+
+// Roadmap:
+//  Allow client to choose whether to choose between storing the processed objects in the cache, vs the raw data. Memory vs CPU tradeoff here.
+//  Add support for siloed caches between GBLoading instances.
+//  As a sideeffect of the above two: named singletons.
 
